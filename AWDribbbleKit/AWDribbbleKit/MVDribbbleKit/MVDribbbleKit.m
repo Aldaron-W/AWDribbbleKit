@@ -186,6 +186,228 @@
         }
     }
 }
+@end
 
+@implementation MVDribbbleKit (Private)
+
+#pragma mark - Private Methods
+
+- (NSString *)retrieveToken
+{
+    if ([SSKeychain accountsForService:kDribbbbleKeychainService]) {
+        NSString *accountUsername = [[SSKeychain accountsForService:kDribbbbleKeychainService][0]
+                                     valueForKey:kSSKeychainAccountKey];
+        
+        return [SSKeychain passwordForService:kDribbbbleKeychainService account:accountUsername];
+    } else {
+        return nil;
+    }
+}
+
+// FIXME: Needs fixed networking methods
+// FIXME: Make it easier to use parameters because appending them to the urlString isn't nice enough
+- (void)GETOperationWithURL:(NSString *)url parameters:(NSDictionary *)parameters
+                    success:(void (^) (NSDictionary *, NSHTTPURLResponse *))success
+                    failure:(void (^) (NSError *, NSHTTPURLResponse *))failure
+{
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    
+    NSString *tempTokenString = [NSString stringWithFormat:@"Bearer %@", [self retrieveToken]];
+    configuration.HTTPAdditionalHeaders = @{@"Content-Type": @"application/json; charset=utf-8",
+                                            @"Authorization": tempTokenString};
+    
+    if (_allowsCellularAccess) {
+        configuration.allowsCellularAccess = YES;
+    } else {
+        configuration.allowsCellularAccess = NO;
+    }
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+    NSMutableString *finalMutableString = [NSMutableString stringWithFormat:@"%@?", url];
+    
+    if (parameters) {
+        // Itterate over the parameters dictionary
+        for (id key in parameters) {
+            id value = parameters[key];
+            [finalMutableString appendString:[NSString stringWithFormat:@"%@=%@&", key, value]];
+        }
+    } else {
+        finalMutableString = [url copy];
+    }
+    
+    if (parameters[@"page"]) {
+        // Append itemsPerPage
+        [finalMutableString appendString:[NSString stringWithFormat:@"per_page=%@", [_itemsPerPage stringValue]]];
+    }
+    
+    [[session dataTaskWithURL:[NSURL URLWithString:finalMutableString] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        NSHTTPURLResponse *convertedResponse = (NSHTTPURLResponse *)response;
+        
+        if (error == nil) {
+            NSError *jsonError = nil;
+            NSDictionary *serializedResults = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+            if (jsonError == nil) {
+                success(serializedResults, convertedResponse);
+            } else {
+                failure(jsonError, nil);
+            }
+        } else {
+            failure(error, convertedResponse);
+        }
+    }] resume];
+}
+
+- (void)PUTOperationWithURL:(NSString *)url parameters:(NSDictionary *)parameters
+                    success:(void (^)(NSDictionary *, NSHTTPURLResponse *))success
+                    failure:(void (^)(NSError *, NSHTTPURLResponse *))failure
+{
+    NSString *tempTokenString = [NSString stringWithFormat:@"Bearer %@", [self retrieveToken]];
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    configuration.HTTPAdditionalHeaders = @{@"Content-Type": @"application/json; charset=utf-8", @"Authorization": tempTokenString};
+    
+    if (_allowsCellularAccess) {
+        configuration.allowsCellularAccess = YES;
+    } else {
+        configuration.allowsCellularAccess = NO;
+    }
+    
+    NSDictionary *tempParameters = [NSDictionary dictionary];
+    
+    if (parameters == nil) {
+        tempParameters = @{@"": @""};
+    } else {
+        tempParameters = parameters;
+    }
+    
+    NSError *error = nil;
+    NSData *parameterData = [NSJSONSerialization dataWithJSONObject:tempParameters options:0 error:&error];
+    
+    if (error == nil) {
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+        request.HTTPMethod = @"PUT";
+        
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+        
+        [[session uploadTaskWithRequest:request fromData:parameterData completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            
+            NSHTTPURLResponse *convertedResponse = (NSHTTPURLResponse *)response;
+            
+            if (error == nil) {
+                NSError *jsonError = nil;
+                NSDictionary *serializedResults = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+                
+                if (jsonError == nil) {
+                    success(serializedResults, convertedResponse);
+                } else {
+                    failure(error, nil);
+                }
+                
+            } else {
+                failure(error, convertedResponse);
+            }
+            
+        }] resume];
+    } else {
+        failure(error, nil);
+    }
+}
+
+- (void)POSTOperationWithURL:(NSString *)url parameters:(NSDictionary *)parameters
+                     success:(void (^)(NSDictionary *, NSHTTPURLResponse *))success
+                     failure:(void (^)(NSError *, NSHTTPURLResponse *))failure
+{
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    
+    NSString *tempTokenString = [NSString stringWithFormat:@"Bearer %@", [self retrieveToken]];
+    
+    if ([self retrieveToken] == nil) {
+        configuration.HTTPAdditionalHeaders = @{@"Content-Type": @"application/json; charset=utf-8"};
+    } else {
+        configuration.HTTPAdditionalHeaders = @{@"Content-Type": @"application/json; charset=utf-8", @"Authorization": tempTokenString};
+    }
+    
+    if (_allowsCellularAccess) {
+        configuration.allowsCellularAccess = YES;
+    } else {
+        configuration.allowsCellularAccess = NO;
+    }
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+    NSDictionary *tempParameters = [NSDictionary dictionary];
+    
+    
+    NSData *parameterData;
+    if (parameters == nil) {
+        tempParameters = @{@"": @""};
+    } else {
+        NSMutableString *paras = [NSMutableString string];
+        for (NSString *key in parameters) {
+            
+            NSString *myString = [NSString stringWithFormat:@"%@=%@&", key, parameters[key]];
+            [paras appendString:myString];
+            
+        }
+        parameterData = [paras dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    }
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    request.HTTPMethod = @"POST";
+    
+    [[session uploadTaskWithRequest:request fromData:parameterData completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        NSHTTPURLResponse *convertedResponse = (NSHTTPURLResponse *)response;
+        
+        if (error == nil) {
+            NSError *jsonError = nil;
+            NSDictionary *serializedResults = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+            
+            if (jsonError == nil) {
+                success(serializedResults, convertedResponse);
+            } else {
+                failure(error, nil);
+            }
+            
+        } else {
+            failure(error, convertedResponse);
+        }
+        
+    }] resume];
+}
+
+// FIXME: Doesn't work correctly
+- (void)DELETEOperationWithURL:(NSString *)url parameters:(NSDictionary *)parameters
+                       success:(void (^)(NSHTTPURLResponse *))success
+                       failure:(void (^)(NSError *, NSHTTPURLResponse *))failure
+{
+    NSString *tempTokenString = [NSString stringWithFormat:@"Bearer %@", [self retrieveToken]];
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    configuration.HTTPAdditionalHeaders = @{@"Authorization": tempTokenString};
+    
+    if (_allowsCellularAccess) {
+        configuration.allowsCellularAccess = YES;
+    } else {
+        configuration.allowsCellularAccess = NO;
+    }
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    request.HTTPMethod = @"DELETE";
+    
+    [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        NSHTTPURLResponse *convertedResponse = (NSHTTPURLResponse *)response;
+        
+        if (error == nil) {
+            success(convertedResponse);
+        } else {
+            failure(error, convertedResponse);
+        }
+        
+    }] resume];
+}
 
 @end

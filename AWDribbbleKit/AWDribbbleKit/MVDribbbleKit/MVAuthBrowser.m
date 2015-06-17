@@ -64,7 +64,7 @@
 - (void)closeBrowser:(id)sender
 {
     _completionHandler(nil, [NSError errorWithDomain:@"MVDribbbleKit" code:1 userInfo:@{NSLocalizedDescriptionKey:@"User canceled authorization"}]);
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -96,7 +96,7 @@
     if ([requestURL isEqualToString:_callbackURL.host]) {
         [webView stopLoading];
         _completionHandler([request URL], nil);
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [self.navigationController popViewControllerAnimated:YES];
         return NO;
     }
     return YES;
