@@ -1,0 +1,13 @@
+PODS:
+  - JSONModel (1.1.0)
+  - SSKeychain (1.2.3)
+
+DEPENDENCIES:
+  - JSONModel
+  - SSKeychain
+
+SPEC CHECKSUMS:
+  JSONModel: ec77e9865236a7a09d9cf7668df6b4b328d9ec1d
+  SSKeychain: 3f42991739c6c60a9cf1bbd4dff6c0d3694bcf3d
+
+COCOAPODS: 0.36.0

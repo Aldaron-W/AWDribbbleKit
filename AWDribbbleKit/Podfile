@@ -1,0 +1,14 @@
+# Uncomment this line to define a global platform for your project
+# platform :ios, '6.0'
+
+target 'AWDribbbleKit' do
+
+pod 'JSONModel'
+pod 'SSKeychain'
+
+end
+
+target 'AWDribbbleKitTests' do
+
+end
+
