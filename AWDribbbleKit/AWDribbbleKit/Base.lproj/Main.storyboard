@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -15,11 +16,58 @@
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="状态：" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9mo-5C-S5E">
+                                <rect key="frame" x="79" y="87" width="51" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="未登录" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lVg-vf-BTT">
+                                <rect key="frame" x="140" y="87" width="51" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gnl-zg-wuo">
+                                <rect key="frame" x="544" y="83" width="30" height="30"/>
+                                <state key="normal" title="登录">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="loginBtnTouchEvent:forEvent:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Rbm-OB-Xn3"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ml3-Dq-CNQ">
+                                <rect key="frame" x="240" y="137" width="120" height="30"/>
+                                <state key="normal" title="获取当前用户详情">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="getCurrentUserInfoBtnTouchEvent:forEvent:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="XXS-dR-GKb"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="9mo-5C-S5E" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="67" id="9Ec-HQ-Har"/>
+                            <constraint firstAttribute="centerX" secondItem="ml3-Dq-CNQ" secondAttribute="centerX" id="C0B-fw-hCt"/>
+                            <constraint firstItem="lVg-vf-BTT" firstAttribute="centerY" secondItem="9mo-5C-S5E" secondAttribute="centerY" id="FHc-TX-q51"/>
+                            <constraint firstItem="9mo-5C-S5E" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="63" id="dkd-UP-csn"/>
+                            <constraint firstItem="ml3-Dq-CNQ" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="117" id="hAh-Sr-PqK"/>
+                            <constraint firstItem="lVg-vf-BTT" firstAttribute="leading" secondItem="9mo-5C-S5E" secondAttribute="trailing" constant="10" id="iS8-ra-WUp"/>
+                            <constraint firstItem="Gnl-zg-wuo" firstAttribute="centerY" secondItem="lVg-vf-BTT" secondAttribute="centerY" constant="0.5" id="p0F-mF-fSc"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Gnl-zg-wuo" secondAttribute="trailing" constant="10" id="wpW-6L-C6S"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="StatusLab" destination="lVg-vf-BTT" id="vJH-kb-jUU"/>
+                        <outlet property="loginBtn" destination="Gnl-zg-wuo" id="4Lb-qz-4Kw"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="807" y="558"/>
         </scene>
     </scenes>
 </document>
